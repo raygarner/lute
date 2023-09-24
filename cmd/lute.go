@@ -5,6 +5,7 @@ import (
 	"flag"
 	"strconv"
 	"errors"
+	"github.com/raygarner/lute/guitarstring"
 )
 
 const frets = 12
@@ -148,7 +149,6 @@ func buildOffsets(tuning string) ([]int, []string) {
 	var lowest = tuning[len(tuning)-2:]
 	var offset int
 
-	fmt.Printf("%v\n", lowest)
 	for i := 0; i < len(tuning); i += 2 {
 		offset = offsets_full[tuning[i:i+2]] - offsets_full[lowest]
 		if offset < 0 {
@@ -167,6 +167,8 @@ func main() {
 	var tonic = flag.Int("s", 8, "fret of the tonic note on the lowest string")
 	var tuning = flag.String("t", "enbngndnanen", "the tuning of the instrument in descending order of pitch (works for any number of strings)")
 	var intervals []int
+	var gs guitarstring.GuitarString
+	_ = gs
 	flag.Parse()
 	intervals, _ = readIntervals(strIntervals)
 	_, n := validIntervals(intervals)
