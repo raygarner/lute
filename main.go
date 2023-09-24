@@ -8,28 +8,34 @@ import (
 )
 
 const frets = 12
-const strings = 6
-const (
-	E int = iota
-	B
-	G
-	D
-	A
-	El
-)
 
-var offsets = [strings]int{
-	36,
-	29,
-	21,
-	14,
-	7,
-	0,
+var offsets_full = map[string]int {
+	"en": 0,
+	"f-": 0,
+	"e+": 11,
+	"fn": 11,
+	"f+": 10,
+	"g-": 10,
+	"gn": 9,
+	"g+": 8,
+	"a-": 8,
+	"an": 7,
+	"a+": 6,
+	"b-": 6,
+	"bn": 5,
+	"c-": 5,
+	"cn": 4,
+	"b+": 4,
+	"c+": 3,
+	"d-": 3,
+	"dn": 2,
+	"d+": 1,
+	"e-": 1,
 }
 
 // prints fret numbers
 func printFrets() {
-	fmt.Printf("  ")
+	fmt.Printf("     ")
 	for i := 1; i <= 12; i++ {
 		fmt.Printf(" %2d ", i)
 	}
@@ -37,8 +43,8 @@ func printFrets() {
 }
 
 // prints one guitar string
-func printGuitarString(guitarString [frets]int) {
-	fmt.Printf("||")
+func printGuitarString(guitarString [frets]int, pitch string) {
+	fmt.Printf("%s ||", pitch)
 	for _, degree := range guitarString {
 		if degree != 0 {
 			fmt.Printf(" %2d|", degree)
@@ -136,24 +142,41 @@ func applyMode(intervals []int, mode int) []int {
 	return intervals
 }
 
+func buildOffsets(tuning string) ([]int, []string) {
+	var offsets []int
+	var names []string
+	var lowest = tuning[len(tuning)-2:]
+	var offset int
+
+	fmt.Printf("%v\n", lowest)
+	for i := 0; i < len(tuning); i += 2 {
+		offset = offsets_full[tuning[i:i+2]] - offsets_full[lowest]
+		if offset < 0 {
+			offset += frets
+		}
+		offsets = append(offsets, offset)
+		names = append(names, tuning[i:i+2])
+	}
+	return offsets, names
+}
+
 func main() {
 	var strIntervals  = flag.String("i", "2212221", "the intervals of the scale in semitones")
 	var mode = flag.Int("m", 1, "mode of the specified scale")
 	var active = flag.String("a", "1111111", "which notes of the scale are active")
-	var tonic = flag.Int("t", 8, "fret of the tonic note on the E string")
+	var tonic = flag.Int("s", 8, "fret of the tonic note on the lowest string")
+	var tuning = flag.String("t", "enbngndnanen", "the tuning of the instrument in descending order of pitch (works for any number of strings)")
 	var intervals []int
 	flag.Parse()
-	if len(*strIntervals) != len(*active) {
-		fmt.Println("Invalid params")
-	}
 	intervals, _ = readIntervals(strIntervals)
 	_, n := validIntervals(intervals)
 	intervals, _ = completeIntervals(intervals, n)
 	intervals = applyMode(intervals, *mode - 1)
 	activity, _ := readActivity(active)
-	for _, offset := range offsets {
+	offsets, string_names := buildOffsets(*tuning)
+	for i, offset := range offsets {
 		guitarString := buildString((*tonic+offset) % frets, intervals, activity)
-		printGuitarString(guitarString)
+		printGuitarString(guitarString, string_names[i])
 	}
 
 	fmt.Println()
