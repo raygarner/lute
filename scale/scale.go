@@ -73,7 +73,7 @@ func completeIntervals(intervals []int, length int) ([]int, error) {
 	return intervals, nil
 }
 
-func Build(strIntervals *string, strActivity *string, rot int) Scale {
+func NewScale(strIntervals *string, strActivity *string, rot int) Scale {
 	var s Scale
 	s.Intervals, _ = readIntervals(strIntervals)
 	_, n := validIntervals(s.Intervals)

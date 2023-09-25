@@ -2,8 +2,9 @@ package main
 
 import (
 	"flag"
-	"github.com/raygarner/lute/guitarstring"
+	//"github.com/raygarner/lute/guitarstring"
 	"github.com/raygarner/lute/scale"
+	"github.com/raygarner/lute/fretboard"
 )
 
 const frets = 12
@@ -59,17 +60,27 @@ func main() {
 	flag.Parse()
 
 
-	var fretboard []guitarstring.GuitarString
-	s := scale.Build(strIntervals, active, *mode)
+	/*
+	var fb []guitarstring.GuitarString
+	//var fb fretboard.Fretboard
+	var test fretboard.Fretboard
+	_ = test
+	s := scale.NewScale(strIntervals, active, *mode)
 	offsets, string_names := buildOffsets(*tuning)
 	for i, offset := range offsets {
-		fretboard = append(fretboard,
-			guitarstring.Build((*tonic+offset) % frets, s,
+		fb = append(fb,
+			guitarstring.NewGuitarString((*tonic+offset) % frets, s,
 			string_names[i]))
 	}
-	for _, gs := range fretboard {
+	for _, gs := range fb {
 		gs.Print()
 	}
+	*/
+
+	s := scale.NewScale(strIntervals, active, *mode)
+	fb := fretboard.NewFretboard(*tuning, s, *tonic)
+	fb.Print()
+
 
 
 }

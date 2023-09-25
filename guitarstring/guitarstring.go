@@ -24,7 +24,7 @@ func (gs GuitarString) Print() {
 	fmt.Println()
 }
 
-func Build(start int, s scale.Scale, pitch string) GuitarString {
+func NewGuitarString(start int, s scale.Scale, pitch string) GuitarString {
 	intervals := s.Intervals
 	active := s.Active
 	var gs GuitarString
