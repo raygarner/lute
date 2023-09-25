@@ -1,6 +1,8 @@
 package main
 
 import (
+	"strconv"
+	"fmt"
 	"flag"
 	"github.com/raygarner/lute/scale"
 	"github.com/raygarner/lute/fretboard"
@@ -14,6 +16,12 @@ func main() {
 	var tuning = flag.String("t", "enbngndnanen", "the tuning of the instrument in descending order of pitch (works for any number of strings)")
 	flag.Parse()
 
+	fmt.Println("Intervals: " + *strIntervals)
+	fmt.Println("Mode: " + strconv.Itoa(*mode))
+	fmt.Println("Active: " + *active)
+	fmt.Println("Tonic: " + strconv.Itoa(*tonic))
+	fmt.Println("Tuning: " + *tuning)
+	fmt.Println()
 	s := scale.NewScale(strIntervals, active, *mode)
 	fb := fretboard.NewFretboard(*tuning, s, *tonic)
 	fb.Print()
