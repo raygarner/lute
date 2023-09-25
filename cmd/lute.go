@@ -6,7 +6,6 @@ import (
 	"github.com/raygarner/lute/fretboard"
 )
 
-
 func main() {
 	var strIntervals  = flag.String("i", "2212221", "the intervals of the scale in semitones")
 	var mode = flag.Int("m", 1, "mode of the specified scale")
