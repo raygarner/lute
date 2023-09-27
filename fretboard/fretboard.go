@@ -4,6 +4,7 @@ import (
 	"github.com/raygarner/lute/guitarstring"
 	"github.com/raygarner/lute/scale"
 	"fmt"
+	"strings"
 )
 
 const frets = 12
@@ -50,6 +51,27 @@ func (fb Fretboard) Print() {
 	}
 	fmt.Println()
 	printFrets()
+}
+
+func (fb Fretboard) PrintRow(fret int) {
+	fmt.Printf("%2d  |", fret+1)
+	for i := len(fb.strings)-1; i >= 0; i-- {
+		fb.strings[i].PrintFret(fret, "")
+	}
+	fmt.Println()
+}
+
+func (fb Fretboard) Printv() {
+	fmt.Printf("    ")
+	for j := len(fb.strings)-1; j >= 0; j-- {
+		fmt.Printf(" %s", fb.strings[j].Pitch)
+	}
+	fmt.Println()
+	fmt.Printf("    ")
+	fmt.Println(strings.Repeat("=", 3*len(fb.strings)+1))
+	for i := 0; i < frets; i++ {
+		fb.PrintRow(i)
+	}
 }
 
 func buildOffsets(tuning string) ([]int, []string) {

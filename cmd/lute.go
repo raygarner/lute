@@ -14,15 +14,20 @@ func main() {
 	var active = flag.String("a", "111111111111", "which notes of the scale are active. One bit per degree, extra bits ignored")
 	var tonic = flag.Int("s", 8, "fret of the tonic note on the lowest string")
 	var tuning = flag.String("t", "enbngndnanen", "the tuning of the instrument in descending order of pitch (works for any number of strings)")
+	var vertical = flag.Bool("v", false, "print fretboard vertically")
 	flag.Parse()
-
 	fmt.Println("Intervals: " + *strIntervals)
 	fmt.Println("Mode: " + strconv.Itoa(*mode))
 	fmt.Println("Active: " + *active)
 	fmt.Println("Tonic: " + strconv.Itoa(*tonic))
 	fmt.Println("Tuning: " + *tuning)
+	fmt.Printf("Vertical: %v\n", *vertical)
 	fmt.Println()
 	s := scale.NewScale(strIntervals, active, *mode)
 	fb := fretboard.NewFretboard(*tuning, s, *tonic)
-	fb.Print()
+	if *vertical == false {
+		fb.Print()
+	} else {
+		fb.Printv()
+	}
 }

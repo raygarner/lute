@@ -9,17 +9,21 @@ const neck_length = 12
 
 type GuitarString struct {
 	frets [neck_length]int
-	pitch string
+	Pitch string
+}
+
+func (gs GuitarString) PrintFret(f int, padding string) {
+	if gs.frets[f] != 0 {
+		fmt.Printf(padding + "%2d|", gs.frets[f])
+	} else {
+		fmt.Printf(padding + "  |")
+	}
 }
 
 func (gs GuitarString) Print() {
-	fmt.Printf("%s ||", gs.pitch)
-	for _, degree := range gs.frets {
-		if degree != 0 {
-			fmt.Printf(" %2d|", degree)
-		} else {
-			fmt.Printf("   |")
-		}
+	fmt.Printf("%s ||", gs.Pitch)
+	for f := 0; f < neck_length; f++ {
+		gs.PrintFret(f, " ")
 	}
 	fmt.Println()
 }
@@ -28,7 +32,7 @@ func NewGuitarString(start int, s scale.Scale, pitch string) GuitarString {
 	intervals := s.Intervals
 	active := s.Active
 	var gs GuitarString
-	gs.pitch = pitch
+	gs.Pitch = pitch
 	if (start == 0) {
 		start = neck_length - 1
 	} else {
