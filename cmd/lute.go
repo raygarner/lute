@@ -15,6 +15,7 @@ func main() {
 	var tonic = flag.Int("s", 8, "fret of the tonic note on the lowest string")
 	var tuning = flag.String("t", "enbngndnanen", "the tuning of the instrument in descending order of pitch (works for any number of strings)")
 	var vertical = flag.Bool("v", false, "print fretboard vertically")
+	var chords = flag.Bool("c", false, "enumerate all playable 4 note chords")
 	flag.Parse()
 	fmt.Println("Intervals: " + *strIntervals)
 	fmt.Println("Mode: " + strconv.Itoa(*mode))
@@ -26,14 +27,11 @@ func main() {
 	s := scale.NewScale(strIntervals, active, *mode)
 	fb := fretboard.NewFretboard(*tuning, s, *tonic)
 	if *vertical == false {
-		fb.Print()
+		fb.Print(0, 12)
 	} else {
 		fb.Printv()
 	}
-	/*
-	var chord []int
-	fmt.Println(fretboard.EnumerateChords(3, chord, 3))
-	fmt.Println(len(fretboard.EnumerateChords(3, chord, 3)))
-	*/
-	fb.PrintChords()
+	if *chords {
+		fb.PrintChords()
+	}
 }

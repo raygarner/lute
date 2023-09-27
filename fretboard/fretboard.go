@@ -40,6 +40,16 @@ var offsets_full = map[string]int {
 	"e-": 1,
 }
 
+func countNotes(chord []int) int {
+	var total = 0
+	for _, i := range chord {
+		if i != 0 {
+			total++
+		}
+	}
+	return total
+}
+
 // degrees = number of degrees in scale
 // len(chord) = number of strings, each element is the degree to be played on that string
 // strings = the number of strings yet to be handled
@@ -50,8 +60,12 @@ func EnumerateChords(degrees int, chord []int, strings int) [][]int {
 	var newchord = make([]int, len(chord))
 
 	if strings == 0 {
-		ret = append(ret, chord)
-		return ret
+		if countNotes(chord) != 4 {
+			return ret
+		} else {
+			//fmt.Println(chord)
+			return append(ret, chord)
+		}
 	}
 	for d := 0; d <= degrees; d++ {
 		copy(newchord, chord)
@@ -65,19 +79,32 @@ func (fb Fretboard) PrintChords() {
 	var chords = EnumerateChords(len(fb.scale.Intervals), chord, len(fb.strings))
 	var tmpfb Fretboard
 	var playable bool
+	var lowest, highest int
 
 	//fmt.Println(chords)
 	for _, c := range chords {
-		tmpfb, playable = fb.applyChord(c)
-		if playable == true {
-			tmpfb.Print()
+		tmpfb, playable, lowest, highest = fb.applyChord(c)
+		if playable {
+			if highest < 5 {
+				lowest = 0
+				highest = 5
+			} else if lowest > frets - 5 {
+				highest = frets
+				lowest = frets - 5
+			} else if highest - lowest < 5 {
+				highest = lowest + 5
+			}
+			//fmt.Printf("lowest = %d\thighest = %d\n", lowest, highest)
+			tmpfb.Print(lowest, highest)
+			fmt.Println()
+			fmt.Println()
 		}
 		//fmt.Println("old:")
 		//fb.Print()
 	}
 }
 
-func (fb Fretboard) applyChord(chord []int) (Fretboard,bool) {
+func (fb Fretboard) applyChord(chord []int) (Fretboard,bool,int,int) {
 	var newfb Fretboard
 	newfb = NewFretboard(fb.tuning, fb.scale, fb.tonic)
 	var lowest = 999
@@ -107,28 +134,28 @@ func (fb Fretboard) applyChord(chord []int) (Fretboard,bool) {
 	fmt.Printf("size = %d\n", size)
 	fmt.Printf("width = %d\n", highest - lowest)
 	*/
-	if (highest - lowest) > 5 || size > 4 {
+	if (highest - lowest) > 4 || size > 4 {
 		playable = false
 	} else {
 		playable = true
 	}
-	return newfb, playable
+	return newfb, playable, lowest, highest
 }
 
-func printFrets() {
+func printFrets(lowest int, highest int) {
 	fmt.Printf("     ")
-	for i := 1; i <= frets; i++ {
+	for i := lowest+1; i <= highest; i++ {
 		fmt.Printf(" %2d ", i)
 	}
 	fmt.Println()
 }
 
-func (fb Fretboard) Print() {
+func (fb Fretboard) Print(lowest int, highest int) {
 	for _, gs := range fb.strings {
-		gs.Print()
+		gs.Print(lowest, highest)
 	}
 	fmt.Println()
-	printFrets()
+	printFrets(lowest, highest)
 }
 
 func (fb Fretboard) PrintRow(fret int) {

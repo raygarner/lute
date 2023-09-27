@@ -20,9 +20,15 @@ func (gs GuitarString) PrintFret(f int, padding string) {
 	}
 }
 
-func (gs GuitarString) Print() {
+func (gs GuitarString) Print(lowest int, highest int) {
 	fmt.Printf("%s ||", gs.Pitch)
-	for f := 0; f < neck_length; f++ {
+	if lowest < 0 {
+		lowest = 0
+	}
+	if highest > neck_length {
+		highest = neck_length
+	}
+	for f := lowest; f < highest; f++ {
 		gs.PrintFret(f, " ")
 	}
 	fmt.Println()
