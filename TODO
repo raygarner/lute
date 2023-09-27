@@ -1,3 +1,15 @@
+vertical chord printing
+hardcode some common scales
+	natural minor
+	harmonic minor
+	melodic minor
+	whole tone
+	diminished
+chord restriction parameterisation
+	max width
+	max notes
+	barred notes
+	double stops
 paralellise chord generation
 parameterise neck length
 vertical printing

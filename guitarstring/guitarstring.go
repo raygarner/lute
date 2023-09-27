@@ -5,7 +5,7 @@ import (
 	"github.com/raygarner/lute/scale"
 )
 
-const neck_length = 12
+const NeckLength = 12
 
 type GuitarString struct {
 	Frets []int
@@ -25,8 +25,8 @@ func (gs GuitarString) Print(lowest int, highest int) {
 	if lowest < 0 {
 		lowest = 0
 	}
-	if highest > neck_length {
-		highest = neck_length
+	if highest > NeckLength {
+		highest = NeckLength
 	}
 	for f := lowest; f < highest; f++ {
 		gs.PrintFret(f, " ")
@@ -38,10 +38,10 @@ func NewGuitarString(start int, s scale.Scale, pitch string) GuitarString {
 	intervals := s.Intervals
 	active := s.Active
 	var gs GuitarString
-	gs.Frets = make([]int, neck_length)
+	gs.Frets = make([]int, NeckLength)
 	gs.Pitch = pitch
 	if (start == 0) {
-		start = neck_length - 1
+		start = NeckLength - 1
 	} else {
 		start--
 	}
@@ -49,15 +49,15 @@ func NewGuitarString(start int, s scale.Scale, pitch string) GuitarString {
 	var currentDegree = 0
 	var degrees = len(intervals)
 	if active[currentDegree % degrees] {
-		gs.Frets[currentFret % neck_length] = (currentDegree % degrees) + 1
+		gs.Frets[currentFret % NeckLength] = (currentDegree % degrees) + 1
 	}
-	currentFret = (currentFret + intervals[currentDegree % degrees]) % neck_length
+	currentFret = (currentFret + intervals[currentDegree % degrees]) % NeckLength
 	currentDegree++
 	for currentFret != start {
 		if active[currentDegree % degrees] {
-			gs.Frets[currentFret % neck_length] = (currentDegree % degrees) + 1
+			gs.Frets[currentFret % NeckLength] = (currentDegree % degrees) + 1
 		}
-		currentFret = (currentFret + intervals[currentDegree % degrees]) % neck_length
+		currentFret = (currentFret + intervals[currentDegree % degrees]) % NeckLength
 		currentDegree++
 	}
 	return gs

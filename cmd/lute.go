@@ -32,6 +32,8 @@ func main() {
 		fb.Printv()
 	}
 	if *chords {
+		fmt.Println()
+		fmt.Println()
 		fb.PrintChords()
 	}
 }

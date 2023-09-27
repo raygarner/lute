@@ -7,7 +7,8 @@ import (
 	"strings"
 )
 
-const frets = 12
+const chordMaxWidth = 4
+const chordDesiredNotes = 4
 
 type Fretboard struct {
 	strings []guitarstring.GuitarString
@@ -60,10 +61,9 @@ func EnumerateChords(degrees int, chord []int, strings int) [][]int {
 	var newchord = make([]int, len(chord))
 
 	if strings == 0 {
-		if countNotes(chord) != 4 {
+		if countNotes(chord) != chordDesiredNotes {
 			return ret
 		} else {
-			//fmt.Println(chord)
 			return append(ret, chord)
 		}
 	}
@@ -81,26 +81,22 @@ func (fb Fretboard) PrintChords() {
 	var playable bool
 	var lowest, highest int
 
-	//fmt.Println(chords)
 	for _, c := range chords {
 		tmpfb, playable, lowest, highest = fb.applyChord(c)
 		if playable {
-			if highest < 5 {
+			if highest < chordMaxWidth {
 				lowest = 0
-				highest = 5
-			} else if lowest > frets - 5 {
-				highest = frets
-				lowest = frets - 5
-			} else if highest - lowest < 5 {
-				highest = lowest + 5
+				highest = chordMaxWidth
+			} else if lowest > guitarstring.NeckLength - chordMaxWidth {
+				highest = guitarstring.NeckLength
+				lowest = guitarstring.NeckLength - chordMaxWidth
+			} else if highest - lowest < chordMaxWidth {
+				highest = lowest + chordMaxWidth
 			}
-			//fmt.Printf("lowest = %d\thighest = %d\n", lowest, highest)
 			tmpfb.Print(lowest, highest)
 			fmt.Println()
 			fmt.Println()
 		}
-		//fmt.Println("old:")
-		//fb.Print()
 	}
 }
 
@@ -129,12 +125,7 @@ func (fb Fretboard) applyChord(chord []int) (Fretboard,bool,int,int) {
 			}
 		}
 	}
-	/*
-	fmt.Println(chord)
-	fmt.Printf("size = %d\n", size)
-	fmt.Printf("width = %d\n", highest - lowest)
-	*/
-	if (highest - lowest) > 4 || size > 4 {
+	if (highest - lowest) > chordMaxWidth-1 || size != chordDesiredNotes {
 		playable = false
 	} else {
 		playable = true
@@ -174,7 +165,7 @@ func (fb Fretboard) Printv() {
 	fmt.Println()
 	fmt.Printf("    ")
 	fmt.Println(strings.Repeat("=", 3*len(fb.strings)+1))
-	for i := 0; i < frets; i++ {
+	for i := 0; i < guitarstring.NeckLength; i++ {
 		fb.PrintRow(i)
 	}
 }
@@ -188,7 +179,7 @@ func buildOffsets(tuning string) ([]int, []string) {
 	for i := 0; i < len(tuning); i += 2 {
 		offset = offsets_full[tuning[i:i+2]] - offsets_full[lowest]
 		if offset < 0 {
-			offset += frets
+			offset += guitarstring.NeckLength
 		}
 		offsets = append(offsets, offset)
 		names = append(names, tuning[i:i+2])
@@ -204,7 +195,7 @@ func NewFretboard(tuning string, s scale.Scale, tonic int) Fretboard {
 	offsets, pitches := buildOffsets(tuning)
 	for i, offset := range offsets {
 		fb.strings = append(fb.strings,
-			guitarstring.NewGuitarString((tonic+offset) % frets, s,
+			guitarstring.NewGuitarString((tonic+offset) % guitarstring.NeckLength, s,
 			pitches[i]))
 	}
 	return fb
