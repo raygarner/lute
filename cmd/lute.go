@@ -24,6 +24,7 @@ func main() {
 	fmt.Println("Tonic: " + strconv.Itoa(*tonic))
 	fmt.Println("Tuning: " + *tuning)
 	fmt.Printf("Vertical: %v\n", *vertical)
+	fmt.Printf("Chords: %v\n", *chords)
 	fmt.Println()
 	s := scale.NewScale(strIntervals, active, *mode)
 	fb := fretboard.NewFretboard(*tuning, s, *tonic)

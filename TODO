@@ -9,9 +9,9 @@ chord restriction parameterisation
 	max notes
 	barred notes
 	double stops
+	specific note in bass
 paralellise chord generation
 parameterise neck length
-vertical printing
 testing
 import+export functionality
 refactoring
@@ -21,7 +21,3 @@ audio output
 	wav files
 	midi files
 capo option
-show ted greene chord diagrams
-	every possible chord for scale
-	every x note chord etc
-	every chord with y in the bass etc
