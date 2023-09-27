@@ -6,6 +6,7 @@ import (
 	"flag"
 	"github.com/raygarner/lute/scale"
 	"github.com/raygarner/lute/fretboard"
+	"github.com/raygarner/lute/guitarstring"
 )
 
 func main() {
@@ -27,13 +28,13 @@ func main() {
 	s := scale.NewScale(strIntervals, active, *mode)
 	fb := fretboard.NewFretboard(*tuning, s, *tonic)
 	if *vertical == false {
-		fb.Print(0, 12)
+		fb.Print(0, guitarstring.NeckLength)
 	} else {
-		fb.Printv()
+		fb.Printv(0, guitarstring.NeckLength)
 	}
 	if *chords {
 		fmt.Println()
 		fmt.Println()
-		fb.PrintChords()
+		fb.PrintChords(*vertical)
 	}
 }

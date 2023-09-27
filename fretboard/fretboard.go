@@ -74,7 +74,7 @@ func EnumerateChords(degrees int, chord []int, strings int) [][]int {
 	return ret
 }
 
-func (fb Fretboard) PrintChords() {
+func (fb Fretboard) PrintChords(vertical bool) {
 	var chord []int
 	var chords = EnumerateChords(len(fb.scale.Intervals), chord, len(fb.strings))
 	var tmpfb Fretboard
@@ -93,7 +93,11 @@ func (fb Fretboard) PrintChords() {
 			} else if highest - lowest < chordMaxWidth {
 				highest = lowest + chordMaxWidth
 			}
-			tmpfb.Print(lowest, highest)
+			if vertical {
+				tmpfb.Printv(lowest, highest)
+			} else {
+				tmpfb.Print(lowest, highest)
+			}
 			fmt.Println()
 			fmt.Println()
 		}
@@ -157,7 +161,7 @@ func (fb Fretboard) PrintRow(fret int) {
 	fmt.Println()
 }
 
-func (fb Fretboard) Printv() {
+func (fb Fretboard) Printv(lowest int, highest int) {
 	fmt.Printf("    ")
 	for j := len(fb.strings)-1; j >= 0; j-- {
 		fmt.Printf(" %s", fb.strings[j].Pitch)
@@ -165,7 +169,13 @@ func (fb Fretboard) Printv() {
 	fmt.Println()
 	fmt.Printf("    ")
 	fmt.Println(strings.Repeat("=", 3*len(fb.strings)+1))
-	for i := 0; i < guitarstring.NeckLength; i++ {
+	if lowest < 0 {
+		lowest = 0
+	}
+	if highest > guitarstring.NeckLength {
+		highest = guitarstring.NeckLength
+	}
+	for i := lowest; i < highest; i++ {
 		fb.PrintRow(i)
 	}
 }
