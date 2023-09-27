@@ -11,6 +11,9 @@ const frets = 12
 
 type Fretboard struct {
 	strings []guitarstring.GuitarString
+	scale scale.Scale
+	tonic int
+	tuning string
 }
 
 var offsets_full = map[string]int {
@@ -35,6 +38,81 @@ var offsets_full = map[string]int {
 	"dn": 2,
 	"d+": 1,
 	"e-": 1,
+}
+
+// degrees = number of degrees in scale
+// len(chord) = number of strings, each element is the degree to be played on that string
+// strings = the number of strings yet to be handled
+// returns a list of chords
+// TODO: remove duplicates
+func EnumerateChords(degrees int, chord []int, strings int) [][]int {
+	var ret [][]int
+	var newchord = make([]int, len(chord))
+
+	if strings == 0 {
+		ret = append(ret, chord)
+		return ret
+	}
+	for d := 0; d <= degrees; d++ {
+		copy(newchord, chord)
+		ret = append(ret, EnumerateChords(degrees, append(newchord, d), strings-1)...)
+	}
+	return ret
+}
+
+func (fb Fretboard) PrintChords() {
+	var chord []int
+	var chords = EnumerateChords(len(fb.scale.Intervals), chord, len(fb.strings))
+	var tmpfb Fretboard
+	var playable bool
+
+	//fmt.Println(chords)
+	for _, c := range chords {
+		tmpfb, playable = fb.applyChord(c)
+		if playable == true {
+			tmpfb.Print()
+		}
+		//fmt.Println("old:")
+		//fb.Print()
+	}
+}
+
+func (fb Fretboard) applyChord(chord []int) (Fretboard,bool) {
+	var newfb Fretboard
+	newfb = NewFretboard(fb.tuning, fb.scale, fb.tonic)
+	var lowest = 999
+	var highest = -1
+	var playable bool
+	var size = 0
+	
+	for i, _ := range newfb.strings {
+		for f, _ := range newfb.strings[i].Frets {
+			if newfb.strings[i].Frets[f] != chord[i] {
+				newfb.strings[i].Frets[f] = 0
+			} else {
+				if chord[i] != 0 {
+					if f < lowest {
+						lowest = f
+					}
+					if f > highest {
+						highest = f
+					}
+					size++
+				}
+			}
+		}
+	}
+	/*
+	fmt.Println(chord)
+	fmt.Printf("size = %d\n", size)
+	fmt.Printf("width = %d\n", highest - lowest)
+	*/
+	if (highest - lowest) > 5 || size > 4 {
+		playable = false
+	} else {
+		playable = true
+	}
+	return newfb, playable
 }
 
 func printFrets() {
@@ -93,6 +171,9 @@ func buildOffsets(tuning string) ([]int, []string) {
 
 func NewFretboard(tuning string, s scale.Scale, tonic int) Fretboard {
 	var fb Fretboard
+	fb.scale = s
+	fb.tonic = tonic
+	fb.tuning = tuning
 	offsets, pitches := buildOffsets(tuning)
 	for i, offset := range offsets {
 		fb.strings = append(fb.strings,

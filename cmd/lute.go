@@ -30,4 +30,10 @@ func main() {
 	} else {
 		fb.Printv()
 	}
+	/*
+	var chord []int
+	fmt.Println(fretboard.EnumerateChords(3, chord, 3))
+	fmt.Println(len(fretboard.EnumerateChords(3, chord, 3)))
+	*/
+	fb.PrintChords()
 }
