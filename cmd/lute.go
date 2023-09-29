@@ -17,6 +17,7 @@ func main() {
 	var tuning = flag.String("t", "enbngndnanen", "the tuning of the instrument in descending order of pitch (works for any number of strings)")
 	var vertical = flag.Bool("v", false, "print fretboard vertically")
 	var chords = flag.Bool("c", false, "enumerate all playable 4 note chords")
+	var enum = flag.Int("e", 0, "enumerate all possible 1 octave scales of given length")
 	flag.Parse()
 	fmt.Println("Intervals: " + *strIntervals)
 	fmt.Println("Mode: " + strconv.Itoa(*mode))
@@ -38,4 +39,14 @@ func main() {
 		fmt.Println()
 		fb.PrintChords(*vertical)
 	}
+	if *enum > 0 {
+		scales := scale.EnumIntervals(*enum)
+		for _, s := range scales {
+			for _, i := range s {
+				fmt.Printf("%d", i)
+			}
+			fmt.Println()
+		}
+	}
+	//fmt.Println(scale.EnumIntervals(7))
 }

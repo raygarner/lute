@@ -3,6 +3,7 @@ package scale
 import (
 	"strconv"
 	"errors"
+	//"fmt"
 )
 
 type Scale struct {
@@ -11,6 +12,36 @@ type Scale struct {
 }
 
 const octave = 12
+
+func sum(intervals []int) int {
+	var total int
+	for _, j := range intervals {
+		total += j
+	}
+	return total
+}
+
+func appendInterval(length int, intervals []int) [][]int {
+	var ret[][]int
+	var newintervals = make([]int, len(intervals))
+
+	if length == 0 {
+		if sum(intervals) != octave {
+			return ret
+		} else {
+			return append(ret, intervals)
+		}
+	}
+	for i := 1; i <= octave - (sum(intervals) + length) + 1; i++ {
+		copy(newintervals, intervals)
+		ret = append(ret, appendInterval(length-1, append(newintervals, i))...)
+	}
+	return ret
+}
+
+func EnumIntervals(length int) [][]int {
+	return appendInterval(length, []int{})
+}
 
 // convert string representation to slice of ints
 func readIntervals(strIntervals *string) ([]int, error) {

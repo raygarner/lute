@@ -80,7 +80,6 @@ func (fb Fretboard) PrintChords(vertical bool) {
 	var tmpfb Fretboard
 	var playable bool
 	var lowest, highest int
-
 	for _, c := range chords {
 		tmpfb, playable, lowest, highest = fb.applyChord(c)
 		if playable {
