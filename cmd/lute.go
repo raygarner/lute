@@ -26,6 +26,7 @@ func main() {
 	fmt.Println("Tuning: " + *tuning)
 	fmt.Printf("Vertical: %v\n", *vertical)
 	fmt.Printf("Chords: %v\n", *chords)
+	fmt.Printf("Enumerate: %d\n", *enum)
 	fmt.Println()
 	s := scale.NewScale(strIntervals, active, *mode)
 	fb := fretboard.NewFretboard(*tuning, s, *tonic)
@@ -39,13 +40,14 @@ func main() {
 		fmt.Println()
 		fb.PrintChords(*vertical)
 	}
+	fmt.Println()
 	if *enum > 0 {
 		scales := scale.EnumIntervals(*enum)
 		for _, s := range scales {
-			for _, i := range s {
-				fmt.Printf("%d", i)
+			for _, i := range s[:len(s)-1] {
+				fmt.Printf("%d,", i)
 			}
-			fmt.Println()
+			fmt.Println(s[len(s)-1])
 		}
 	}
 	//fmt.Println(scale.EnumIntervals(7))
