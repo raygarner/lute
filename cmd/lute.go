@@ -10,7 +10,7 @@ import (
 )
 
 func main() {
-	var strIntervals  = flag.String("i", "2212221", "the intervals of the scale in semitones")
+	var strIntervals  = flag.String("i", "2,2,1,2,2,2,1", "the intervals of the scale in semitones")
 	var mode = flag.Int("m", 1, "mode of the specified scale")
 	var active = flag.String("a", "111111111111", "which notes of the scale are active. One bit per degree, extra bits ignored")
 	var tonic = flag.Int("s", 8, "fret of the tonic note on the lowest string")
@@ -28,7 +28,12 @@ func main() {
 	fmt.Printf("Chords: %v\n", *chords)
 	fmt.Printf("Enumerate: %d\n", *enum)
 	fmt.Println()
-	s := scale.NewScale(strIntervals, active, *mode)
+	s, err := scale.NewScale(strIntervals, active, *mode)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	fmt.Println(s.Intervals)
 	fb := fretboard.NewFretboard(*tuning, s, *tonic)
 	if *vertical == false {
 		fb.Print(0, guitarstring.NeckLength)
@@ -38,16 +43,24 @@ func main() {
 	if *chords {
 		fmt.Println()
 		fmt.Println()
+		fmt.Println("Enumerating all 4 note chords from given scale:")
+		fmt.Println()
 		fb.PrintChords(*vertical)
 	}
-	fmt.Println()
+	var newScale scale.Scale
 	if *enum > 0 {
+		fmt.Printf("Enumerating all %d note scales:\n", *enum)
 		scales := scale.EnumIntervals(*enum)
 		for _, s := range scales {
-			for _, i := range s[:len(s)-1] {
-				fmt.Printf("%d,", i)
+			fmt.Println()
+			fmt.Println(s)
+			newScale = scale.NewScaleFromIntervals(s)
+			fb = fretboard.NewFretboard(*tuning, newScale, *tonic)
+			if *vertical == false {
+				fb.Print(0, guitarstring.NeckLength)
+			} else {
+				fb.Printv(0, guitarstring.NeckLength)
 			}
-			fmt.Println(s[len(s)-1])
 		}
 	}
 	//fmt.Println(scale.EnumIntervals(7))

@@ -3,8 +3,26 @@ package scale
 import (
 	"strconv"
 	"errors"
+	"strings"
 	//"fmt"
 )
+
+// TODO: implement these
+var ScaleAlias = map[string][]int {
+	"Ionian": []int{2,2,1,2,2,2,1}, //ionian
+	"Dorian": []int{2,2,1,2,2,2,1}, //dorian
+	"Phrygian": []int{2,2,1,2,2,2,1}, //phrygian
+	"Lydian": []int{2,2,1,2,2,2,1}, //lydian
+	"Mixolydian": []int{2,2,1,2,2,2,1}, //mixolydian
+	"Aeolian": []int{2,2,1,2,2,2,1}, //aeolian
+	"Locrian": []int{2,2,1,2,2,2,1}, //locrian
+	"Diminished": []int{2,2,1,2,2,2,1}, //diminished
+	"Whole Tone": []int{2,2,1,2,2,2,1}, //whole tone
+	"Chromatic": []int{2,2,1,2,2,2,1}, //chromatic
+	"Harmonic Minor": []int{2,2,1,2,2,2,1}, //harmonic minor
+	"Melodic Minor": []int{2,2,1,2,2,2,1}, //melodic minor
+	"Overtone Dominant": []int{2,2,1,2,2,2,1}, //overtone dominant (4 of melodic minor)
+}
 
 type Scale struct {
 	Intervals []int
@@ -12,6 +30,7 @@ type Scale struct {
 }
 
 const octave = 12
+const seperator = ","
 
 func sum(intervals []int) int {
 	var total int
@@ -44,9 +63,10 @@ func EnumIntervals(length int) [][]int {
 }
 
 // convert string representation to slice of ints
+// TODO: read intervals seperated by commas
 func readIntervals(strIntervals *string) ([]int, error) {
 	var intIntervals []int
-	for _, strInterval := range *strIntervals {
+	for _, strInterval := range strings.Split(*strIntervals, seperator) {
 		val, _ := strconv.Atoi(string(strInterval))
 		intIntervals = append(intIntervals, val)
 	}
@@ -101,15 +121,30 @@ func completeIntervals(intervals []int, length int) ([]int, error) {
 		intervals = append(intervals, intervals[i])
 		i++
 	}
-	return intervals, nil
+	if sum(intervals) == octave {
+		return intervals, nil
+	} else {
+		return intervals, errors.New("Intervals do not form an octave")
+	}
 }
 
-func NewScale(strIntervals *string, strActivity *string, rot int) Scale {
+func NewScale(strIntervals *string, strActivity *string, rot int) (Scale, error) {
 	var s Scale
+	var err error
 	s.Intervals, _ = readIntervals(strIntervals)
 	_, n := validIntervals(s.Intervals)
-	s.Intervals, _ = completeIntervals(s.Intervals, n)
+	s.Intervals, err = completeIntervals(s.Intervals, n)
 	s.Intervals = applyMode(s.Intervals, rot - 1)
 	s.Active, _ = readActivity(strActivity)
+	return s, err
+}
+
+// assumes intervals are valid
+func NewScaleFromIntervals(intervals []int) Scale {
+	var s Scale
+	s.Intervals = intervals
+	for i := 0; i < octave; i++ {
+		s.Active = append(s.Active, true)
+	}
 	return s
 }

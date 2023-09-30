@@ -1,4 +1,5 @@
 be able to read double digit intervals
+read a list of intervals (-i 2212221,2,21 to print major, whole tone and diminished)
 hardcode some common scales
 	natural minor
 	harmonic minor
