@@ -83,6 +83,7 @@ func (fb Fretboard) PrintChords(vertical bool) {
 	for _, c := range chords {
 		tmpfb, playable, lowest, highest = fb.applyChord(c)
 		if playable {
+			fmt.Println(c)
 			if highest < chordMaxWidth {
 				lowest = 0
 				highest = chordMaxWidth
@@ -103,6 +104,7 @@ func (fb Fretboard) PrintChords(vertical bool) {
 	}
 }
 
+// TODO: tidy this return
 func (fb Fretboard) applyChord(chord []int) (Fretboard,bool,int,int) {
 	var newfb Fretboard
 	newfb = NewFretboard(fb.tuning, fb.scale, fb.tonic)
