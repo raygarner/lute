@@ -18,7 +18,6 @@ func main() {
 	var vertical = flag.Bool("v", false, "print fretboard vertically")
 	var chords = flag.Bool("c", false, "enumerate all playable 4 note chords")
 	var enum = flag.Int("e", 0, "enumerate all possible 1 octave scales of given length")
-	var showAliases = flag.Bool("l", false, "List all scale aliases and exit")
 	flag.Parse()
 	fmt.Println("Intervals: " + *strIntervals)
 	fmt.Println("Mode: " + strconv.Itoa(*mode))
@@ -28,31 +27,28 @@ func main() {
 	fmt.Printf("Vertical: %v\n", *vertical)
 	fmt.Printf("Chords: %v\n", *chords)
 	fmt.Printf("Enumerate: %d\n", *enum)
-	fmt.Printf("List Aliases: %v\n", *showAliases)
 	fmt.Println()
 	fmt.Println()
-	/*
-	if *showAliases {
-		for k, v := range scale.ScaleAlias {
-			fmt.Printf("%s: ", k)
-			fmt.Println(v)
-		}
-		return
-	}
-	*/
 	s, err := scale.NewScale(strIntervals, active, *mode)
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
-	fmt.Printf("%s: ", scale.IntervalsAlias[scale.IntervalsToString(s.Intervals)])
-	fmt.Println(scale.IntervalsToString(s.Intervals))
+	fmt.Printf("%s: ", s.Name)
+	fmt.Println(s.StrIntervals)
 	fmt.Println()
 	fb := fretboard.NewFretboard(*tuning, s, *tonic)
 	if *vertical == false {
 		fb.Print(0, guitarstring.NeckLength)
 	} else {
 		fb.Printv(0, guitarstring.NeckLength)
+	}
+	fmt.Println()
+	fmt.Println()
+	fmt.Println("Relative modes:")
+	relatives := scale.RelativeScales(s.Intervals)
+	for m, r := range relatives {
+		fmt.Printf("%d: %s %s\n", m+2, r.StrIntervals, r.Name)
 	}
 	if *chords {
 		fmt.Println()
@@ -65,8 +61,7 @@ func main() {
 	if *enum > 0 {
 		fmt.Printf("Enumerating all %d note scales:\n", *enum)
 		scales := scale.EnumIntervals(*enum)
-		for i, s := range scales {
-			fmt.Println(i)
+		for _, s := range scales {
 			fmt.Println()
 			fmt.Println(s)
 			newScale = scale.NewScaleFromIntervals(s)

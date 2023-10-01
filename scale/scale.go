@@ -39,21 +39,28 @@ var IntervalsAlias = map[string]string {
 	"1,3,1,2,2,1,2": "Mixolydian b2",
 	"3,1,2,2,1,2,1": "Lydian Augmented #2",
 	"1,2,2,1,2,1,3": "Locrian bb7",
+
+	"2,1,2,1,2,1,2,1": "Diminished",
+	"1,2,1,2,1,2,1,2": "Dominant Diminished",
 }
 
 type Scale struct {
 	Intervals []int
 	Active []bool
 	StrIntervals string
-	name string
+	Name string
 }
 
 const octave = 12
 const seperator = ","
 
 // TODO: implement this
-func RelativeScales() []Scale {
+func RelativeScales(intervals []int) []Scale {
 	var ret []Scale
+	for i := 0; i < len(intervals)-1; i++ {
+		intervals = rot(intervals)
+		ret = append(ret, NewScaleFromIntervals(intervals))
+	}
 	return ret
 }
 
@@ -171,14 +178,24 @@ func completeIntervals(intervals []int, length int) ([]int, error) {
 	}
 }
 
+func IdentifyIntervals(strIntervals string) string {
+	ret := IntervalsAlias[strIntervals]
+	if ret == "" {
+		return "Common name unknown"
+	} else {
+		return ret
+	}
+}
+
 func NewScale(strIntervals *string, strActivity *string, rot int) (Scale, error) {
 	var s Scale
 	var err error
-	s.StrIntervals = *strIntervals
 	s.Intervals, _ = readIntervals(strIntervals)
 	_, n := validIntervals(s.Intervals)
 	s.Intervals, err = completeIntervals(s.Intervals, n)
 	s.Intervals = applyMode(s.Intervals, rot - 1)
+	s.StrIntervals = IntervalsToString(s.Intervals)
+	s.Name = IdentifyIntervals(s.StrIntervals)
 	s.Active, _ = readActivity(strActivity)
 	return s, err
 }
@@ -187,6 +204,8 @@ func NewScale(strIntervals *string, strActivity *string, rot int) (Scale, error)
 func NewScaleFromIntervals(intervals []int) Scale {
 	var s Scale
 	s.Intervals = intervals
+	s.StrIntervals = IntervalsToString(intervals)
+	s.Name = IdentifyIntervals(s.StrIntervals)
 	for i := 0; i < octave; i++ {
 		s.Active = append(s.Active, true)
 	}
