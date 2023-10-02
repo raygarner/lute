@@ -1,16 +1,10 @@
 use actual notes
+	pitch naming will be necessary (use algorithm from mosaic)
 be able to detect symmetric scales when calculating relative modes
 parameterise the ammount of tones in an octave
+	would involve also changing neck length
 code review
-put scales database in external file like json
-show relative modes for each scale
 read a list of intervals somehow (maybe -i [2,2,1,2,2,2,1],[2,1] to show major and diminished
-hardcode some common scales
-	natural minor
-	harmonic minor
-	melodic minor
-	whole tone
-	diminished
 chord restriction parameterisation
 	max width
 	max notes

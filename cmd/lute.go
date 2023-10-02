@@ -4,6 +4,8 @@ import (
 	"strconv"
 	"fmt"
 	"flag"
+	"io/ioutil"
+	"encoding/json"
 	"github.com/raygarner/lute/scale"
 	"github.com/raygarner/lute/fretboard"
 	"github.com/raygarner/lute/guitarstring"
@@ -29,6 +31,18 @@ func main() {
 	fmt.Printf("Enumerate: %d\n", *enum)
 	fmt.Println()
 	fmt.Println()
+
+	// TODO: make this path installable
+	data, err := ioutil.ReadFile("./data/modes.json")
+	if err != nil {
+		fmt.Println(err)
+	}
+	fmt.Printf("%T\n", data)
+	err = json.Unmarshal(data, &scale.IntervalsAlias)
+	if err != nil {
+		fmt.Println(err)
+	}
+	fmt.Println(scale.IntervalsAlias)
 	s, err := scale.NewScale(strIntervals, active, *mode)
 	if err != nil {
 		fmt.Println(err)
