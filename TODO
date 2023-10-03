@@ -1,3 +1,6 @@
+regex compatability for specifying activity string
+input safety
+make json path installable
 use actual notes
 	pitch naming will be necessary (use algorithm from mosaic)
 be able to detect symmetric scales when calculating relative modes

@@ -71,7 +71,7 @@ func readIntervals(strIntervals *string) ([]int, error) {
 }
 
 // builds a slice of bool from binary string
-func readActivity(strActivity *string) ([]bool, error) {
+func readActivity(strActivity *string, intervalLen int) ([]bool, error) {
 	var activity []bool
 	for _, strBit := range *strActivity {
 		if string(strBit) == "1" {
@@ -81,6 +81,9 @@ func readActivity(strActivity *string) ([]bool, error) {
 		} else {
 			return activity, errors.New("Invalid activity format")
 		}
+	}
+	for len(activity) < intervalLen {
+		activity = append(activity, false)
 	}
 	return activity, nil
 }
@@ -161,7 +164,7 @@ func NewScale(strIntervals *string, strActivity *string, rot int) (Scale, error)
 	s.Intervals = applyMode(s.Intervals, rot - 1)
 	s.StrIntervals = IntervalsToString(s.Intervals)
 	s.Name = IdentifyIntervals(s.StrIntervals)
-	s.Active, _ = readActivity(strActivity)
+	s.Active, _ = readActivity(strActivity, len(s.StrIntervals))
 	return s, err
 }
 
