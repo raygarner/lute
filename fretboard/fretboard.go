@@ -1,10 +1,11 @@
 package fretboard
 
 import (
-	"github.com/raygarner/lute/guitarstring"
-	"github.com/raygarner/lute/scale"
+	"io"
 	"fmt"
 	"strings"
+	"github.com/raygarner/lute/guitarstring"
+	"github.com/raygarner/lute/scale"
 )
 
 const chordMaxWidth = 4
@@ -74,7 +75,7 @@ func EnumerateChords(degrees int, chord []int, strings int) [][]int {
 	return ret
 }
 
-func (fb Fretboard) PrintChords(vertical bool) {
+func (fb Fretboard) PrintChords(vertical bool, output io.Writer) {
 	var chord []int
 	var chords = EnumerateChords(len(fb.scale.Intervals), chord, len(fb.strings))
 	var tmpfb Fretboard
@@ -83,7 +84,8 @@ func (fb Fretboard) PrintChords(vertical bool) {
 	for _, c := range chords {
 		tmpfb, playable, lowest, highest = fb.applyChord(c)
 		if playable {
-			fmt.Println(c)
+			//fmt.Println(c)
+			fmt.Fprintln(output, c)
 			if highest < chordMaxWidth {
 				lowest = 0
 				highest = chordMaxWidth
@@ -94,12 +96,13 @@ func (fb Fretboard) PrintChords(vertical bool) {
 				highest = lowest + chordMaxWidth
 			}
 			if vertical {
-				tmpfb.Printv(lowest, highest)
+				//tmpfb.Printv(lowest, highest)
+				tmpfb.Printv(lowest, highest, output)
 			} else {
-				tmpfb.Print(lowest, highest)
+				//tmpfb.Print(lowest, highest)
+				tmpfb.Print(lowest, highest, output)
 			}
-			fmt.Println()
-			fmt.Println()
+			fmt.Fprintf(output, "\n\n")
 		}
 	}
 }
@@ -138,38 +141,49 @@ func (fb Fretboard) applyChord(chord []int) (Fretboard,bool,int,int) {
 	return newfb, playable, lowest, highest
 }
 
-func printFrets(lowest int, highest int) {
-	fmt.Printf("     ")
+func printFrets(lowest int, highest int, output io.Writer) {
+	//fmt.Printf("     ")
+	fmt.Fprintf(output, "     ")
 	for i := lowest+1; i <= highest; i++ {
-		fmt.Printf(" %2d ", i)
+		//fmt.Printf(" %2d ", i)
+		fmt.Fprintf(output, " %2d ", i)
 	}
-	fmt.Println()
+	//fmt.Println()
+	fmt.Fprintln(output, )
 }
 
-func (fb Fretboard) Print(lowest int, highest int) {
+func (fb Fretboard) Print(lowest int, highest int, output io.Writer) {
 	for _, gs := range fb.strings {
-		gs.Print(lowest, highest)
+		gs.Print(lowest, highest, output)
 	}
-	fmt.Println()
-	printFrets(lowest, highest)
+	//fmt.Println()
+	fmt.Fprintln(output,)
+	printFrets(lowest, highest, output)
 }
 
-func (fb Fretboard) PrintRow(fret int) {
-	fmt.Printf("%2d  |", fret+1)
+func (fb Fretboard) PrintRow(fret int, output io.Writer) {
+	//fmt.Printf("%2d  |", fret+1)
+	fmt.Fprintf(output, "%2d  |", fret+1)
 	for i := len(fb.strings)-1; i >= 0; i-- {
-		fb.strings[i].PrintFret(fret, "")
+		fb.strings[i].PrintFret(fret, "", output)
 	}
-	fmt.Println()
+	//fmt.Println()
+	fmt.Fprintln(output, )
 }
 
-func (fb Fretboard) Printv(lowest int, highest int) {
-	fmt.Printf("    ")
+func (fb Fretboard) Printv(lowest int, highest int, output io.Writer) {
+	//fmt.Printf("    ")
+	fmt.Fprintf(output, "    ")
 	for j := len(fb.strings)-1; j >= 0; j-- {
-		fmt.Printf(" %s", fb.strings[j].Pitch)
+		//fmt.Printf(" %s", fb.strings[j].Pitch)
+		fmt.Fprintf(output, " %s", fb.strings[j].Pitch)
 	}
-	fmt.Println()
-	fmt.Printf("    ")
-	fmt.Println(strings.Repeat("=", 3*len(fb.strings)+1))
+	//fmt.Println()
+	fmt.Fprintln(output,)
+	//fmt.Printf("    ")
+	fmt.Fprintf(output, "    ")
+	//fmt.Println(strings.Repeat("=", 3*len(fb.strings)+1))
+	fmt.Fprintln(output, strings.Repeat("=", 3*len(fb.strings)+1))
 	if lowest < 0 {
 		lowest = 0
 	}
@@ -177,7 +191,7 @@ func (fb Fretboard) Printv(lowest int, highest int) {
 		highest = guitarstring.NeckLength
 	}
 	for i := lowest; i < highest; i++ {
-		fb.PrintRow(i)
+		fb.PrintRow(i, output)
 	}
 }
 

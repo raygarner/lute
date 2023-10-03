@@ -3,8 +3,9 @@ package main
 import (
 	"fmt"
 	"flag"
-	"io/ioutil"
+	"io"
 	"encoding/json"
+	"os"
 	"github.com/raygarner/lute/scale"
 	"github.com/raygarner/lute/fretboard"
 	"github.com/raygarner/lute/guitarstring"
@@ -27,33 +28,45 @@ func main() {
 	var outputFile = flag.String("o", "", "Write output to specified file")
 	var vertical = flag.Bool("v", false, "Print diagrams vertically instead of horizontally")
 
+	var output io.Writer
+	var err error
+
 	flag.Parse()
+	if *outputFile == "" {
+		output = os.Stdout
+	} else {
+		output, err = os.Create(*outputFile)
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+	}
 	// if no mode is specified
 	if *strIntervals == "" && *enumScales == 0 {
-		fmt.Println("Please specify either -i or -e")
-		fmt.Println("Use -h to display help")
+		fmt.Fprintln(output, "Please specify either -i or -e")
+		fmt.Fprintln(output, "Use -h to display help")
 		return
 	}
 
 	// general options
-	data, err := ioutil.ReadFile(*database)
+	data, err := os.ReadFile(*database)
 	if err != nil {
-		fmt.Println(err)
+		fmt.Fprintln(output, err)
 	}
 	err = json.Unmarshal(data, &scale.IntervalsAlias)
 	if err != nil {
-		fmt.Println(err)
+		fmt.Fprintln(output, err)
 	}
 	_ = outputFile
 
 	// -i mode
 	if *strIntervals != "" {
 		if *enumScales != 0 {
-			fmt.Println("-i and -e cannot be used together")
+			fmt.Fprintln(output, "-i and -e cannot be used together")
 			return
 		}
 		if *tonic == 0 {
-			fmt.Println("Please specify the root using -s")
+			fmt.Fprintln(output, "Please specify the root using -s")
 			return
 		}
 		if *active == "*" {
@@ -61,31 +74,31 @@ func main() {
 		}
 		s, err := scale.NewScale(strIntervals, active, *mode)
 		if err != nil {
-			fmt.Println(err)
+			fmt.Fprintln(output, err)
 			return
 		}
-		fmt.Printf("%s: ", s.Name)
-		fmt.Println(s.StrIntervals)
-		fmt.Println()
+		fmt.Fprintf(output, "%s: ", s.Name)
+		fmt.Fprintln(output, s.StrIntervals)
+		fmt.Fprintln(output, )
 		fb := fretboard.NewFretboard(*tuning, s, *tonic)
 		if *vertical {
-			fb.Printv(0, guitarstring.NeckLength)
+			fb.Printv(0, guitarstring.NeckLength, output)
 		} else {
-			fb.Print(0, guitarstring.NeckLength)
+			fb.Print(0, guitarstring.NeckLength, output)
 		}
-		fmt.Println()
-		fmt.Println()
-		fmt.Println("Relative modes:")
+		fmt.Fprintln(output, )
+		fmt.Fprintln(output, )
+		fmt.Fprintln(output, "Relative modes:")
 		relatives := scale.RelativeScales(s.Intervals)
 		for m, r := range relatives {
-			fmt.Printf("%d: %s %s\n", m+2, r.StrIntervals, r.Name)
+			fmt.Fprintf(output, "%d: %s %s\n", m+2, r.StrIntervals, r.Name)
 		}
 		if *enumChords {
-			fmt.Println()
-			fmt.Println()
-			fmt.Println("Enumerating all 4 note chords from given scale:")
-			fmt.Println()
-			fb.PrintChords(*vertical)
+			fmt.Fprintln(output, )
+			fmt.Fprintln(output, )
+			fmt.Fprintln(output, "Enumerating all 4 note chords from given scale:")
+			fmt.Fprintln(output, )
+			fb.PrintChords(*vertical, output)
 		}
 		return
 	}
@@ -93,35 +106,35 @@ func main() {
 	// -e mode
 	if *enumScales != 0 {
 		if *strIntervals != "" {
-			fmt.Println("-i and -e cannot be used together")
+			fmt.Fprintln(output, "-i and -e cannot be used together")
 			return
 		}
 		if *tonic == 0 {
-			fmt.Println("Please specify the root using -s")
+			fmt.Fprintln(output, "Please specify the root using -s")
 			return
 		}
 		if *enumChords {
-			fmt.Println("-c cannot be used with -e")
+			fmt.Fprintln(output, "-c cannot be used with -e")
 			return
 		}
 		if *active != "*" {
-			fmt.Println("-a cannot be used with -e")
+			fmt.Fprintln(output, "-a cannot be used with -e")
 			return
 		}
 		if *mode != 1 {
-			fmt.Println("-m cannot be used with -e")
+			fmt.Fprintln(output, "-m cannot be used with -e")
 		}
 		var newScale scale.Scale
 		scales := scale.EnumIntervals(*enumScales)
 		for _, s := range scales {
-			fmt.Println()
-			fmt.Println(s)
+			fmt.Fprintln(output, )
+			fmt.Fprintln(output, s)
 			newScale = scale.NewScaleFromIntervals(s)
 			fb := fretboard.NewFretboard(*tuning, newScale, *tonic)
 			if *vertical == false {
-				fb.Print(0, guitarstring.NeckLength)
+				fb.Print(0, guitarstring.NeckLength, output)
 			} else {
-				fb.Printv(0, guitarstring.NeckLength)
+				fb.Printv(0, guitarstring.NeckLength, output)
 			}
 		}
 	}

@@ -1,6 +1,7 @@
 package guitarstring
 
 import (
+	"io"
 	"fmt"
 	"github.com/raygarner/lute/scale"
 )
@@ -12,16 +13,19 @@ type GuitarString struct {
 	Pitch string
 }
 
-func (gs GuitarString) PrintFret(f int, padding string) {
+func (gs GuitarString) PrintFret(f int, padding string, output io.Writer) {
 	if gs.Frets[f] != 0 {
-		fmt.Printf(padding + "%2d|", gs.Frets[f])
+		//fmt.Printf(padding + "%2d|", gs.Frets[f])
+		fmt.Fprintf(output, padding + "%2d|", gs.Frets[f])
 	} else {
-		fmt.Printf(padding + "  |")
+		//fmt.Printf(padding + "  |")
+		fmt.Fprintf(output, padding + "  |")
 	}
 }
 
-func (gs GuitarString) Print(lowest int, highest int) {
-	fmt.Printf("%s ||", gs.Pitch)
+func (gs GuitarString) Print(lowest int, highest int, output io.Writer) {
+	//fmt.Printf("%s ||", gs.Pitch)
+	fmt.Fprintf(output, "%s ||", gs.Pitch)
 	if lowest < 0 {
 		lowest = 0
 	}
@@ -29,9 +33,10 @@ func (gs GuitarString) Print(lowest int, highest int) {
 		highest = NeckLength
 	}
 	for f := lowest; f < highest; f++ {
-		gs.PrintFret(f, " ")
+		gs.PrintFret(f, " ", output)
 	}
-	fmt.Println()
+	//fmt.Println()
+	fmt.Fprintln(output, )
 }
 
 func NewGuitarString(start int, s scale.Scale, pitch string) GuitarString {
