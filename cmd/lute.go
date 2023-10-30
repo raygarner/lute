@@ -23,7 +23,9 @@ func main() {
 	var enumScales = flag.Int("e", 0, "Enumerate all possible 1 octave scales of n notes")
 
 	// General options
-	var database = flag.String("d", "./data/modes.json", "Path to JSON file containing aliases for interval permuations")
+	//var database = flag.String("d", "~/go/src/lute/data/modes.json", "Path to JSON file containing aliases for interval permuations")
+	var database = flag.String("d", os.Getenv("HOME") + "/go/src/lute/data/modes.json", "Path to JSON file containing aliases for interval permuations")
+
 	var tuning = flag.String("t", "enbngndnanen", "Pitches of strings in descending order. Variable length.")
 	var outputFile = flag.String("o", "", "Write output to specified file")
 	var vertical = flag.Bool("v", false, "Print diagrams vertically instead of horizontally")
