@@ -37,9 +37,10 @@ func sum(intervals []int) int {
 	return total
 }
 
-func appendInterval(length int, intervals []int) [][]int {
+func appendInterval(length int, intervals []int, maxSemitones int) [][]int {
 	var ret[][]int
 	var newintervals = make([]int, len(intervals))
+	var st int
 
 	if length == 0 {
 		if sum(intervals) != octave {
@@ -49,14 +50,25 @@ func appendInterval(length int, intervals []int) [][]int {
 		}
 	}
 	for i := 1; i <= octave - (sum(intervals) + length) + 1; i++ {
-		copy(newintervals, intervals)
-		ret = append(ret, appendInterval(length-1, append(newintervals, i))...)
+		if i == 1 && len(intervals) >= maxSemitones-1 {
+			for j := len(intervals) - 1; j >= len(intervals) - (maxSemitones-1); j-- {
+				if intervals[j] == 1 {
+					st++
+				}
+			}
+		}
+		if st < maxSemitones-1 {
+			copy(newintervals, intervals)
+			ret = append(ret, appendInterval(length-1, append(newintervals, i), maxSemitones)...)
+		} else {
+			st = 0
+		}
 	}
 	return ret
 }
 
-func EnumIntervals(length int) [][]int {
-	return appendInterval(length, []int{})
+func EnumIntervals(length int, maxSemitones int) [][]int {
+	return appendInterval(length, []int{}, maxSemitones)
 }
 
 // convert string representation to slice of ints

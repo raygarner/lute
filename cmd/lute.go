@@ -21,6 +21,7 @@ func main() {
 
 	// Mode 2: enumerate scales
 	var enumScales = flag.Int("e", 0, "Enumerate all possible 1 octave scales of n notes")
+	var maxSemitones = flag.Int("f", 12, "Max number of consecutive semitones allowed in generated scales")
 
 	// General options
 	//var database = flag.String("d", "~/go/src/lute/data/modes.json", "Path to JSON file containing aliases for interval permuations")
@@ -69,6 +70,10 @@ func main() {
 		}
 		if *tonic == 0 {
 			fmt.Fprintln(output, "Please specify the root using -s")
+			return
+		}
+		if *maxSemitones != 12 {
+			fmt.Fprintln(output, "-f cannot be used with -s")
 			return
 		}
 		if *active == "*" {
@@ -127,7 +132,7 @@ func main() {
 			fmt.Fprintln(output, "-m cannot be used with -e")
 		}
 		var newScale scale.Scale
-		scales := scale.EnumIntervals(*enumScales)
+		scales := scale.EnumIntervals(*enumScales, *maxSemitones)
 		for _, s := range scales {
 			fmt.Fprintln(output, )
 			fmt.Fprintln(output, s)

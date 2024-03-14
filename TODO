@@ -1,3 +1,7 @@
+move a chord shape stepwise through a scale shape in parallel
+create visual colour/pattern mapping for each chord/scale and write this to png
+write score/tab to pdf
+hash values for scales and chords
 regex compatability for specifying activity string
 input safety
 make json path installable
