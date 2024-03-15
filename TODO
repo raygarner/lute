@@ -1,3 +1,9 @@
+combine reading intervals (in scale) and reading steps (in fb)
+implement TG V-system for chords
+chord construction by interval spec
+	take a scale, bass note (degree of scale), list of steps to apply
+	eg 8 2,2,1,2,2,2,1 1 3,3 for C major triad
+	optional: take an extra arg to specify the inversion of this chord
 move a chord shape stepwise through a scale shape in parallel
 create visual colour/pattern mapping for each chord/scale and write this to png
 write score/tab to pdf

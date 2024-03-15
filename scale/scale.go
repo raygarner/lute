@@ -72,7 +72,6 @@ func EnumIntervals(length int, maxSemitones int) [][]int {
 }
 
 // convert string representation to slice of ints
-// TODO: read intervals seperated by commas
 func readIntervals(strIntervals *string) ([]int, error) {
 	var intIntervals []int
 	for _, strInterval := range strings.Split(*strIntervals, seperator) {
@@ -100,7 +99,7 @@ func readActivity(strActivity *string, intervalLen int) ([]bool, error) {
 	return activity, nil
 }
 
-func IntervalsToString(intervals []int) string {
+func intervalsToString(intervals []int) string {
 	var ret string
 	for _, i := range intervals[:len(intervals)-1] {
 		ret += strconv.Itoa(i)
@@ -116,10 +115,10 @@ func rot(s []int) []int {
 }
 
 func CalcStrings(baseIntervals []int) {
-	fmt.Println(IntervalsToString(baseIntervals))
+	fmt.Println(intervalsToString(baseIntervals))
 	for _, _ = range baseIntervals {
 		baseIntervals = rot(baseIntervals)
-		fmt.Println(IntervalsToString(baseIntervals))
+		fmt.Println(intervalsToString(baseIntervals))
 	}
 }
 
@@ -174,7 +173,7 @@ func NewScale(strIntervals *string, strActivity *string, rot int) (Scale, error)
 	_, n := validIntervals(s.Intervals)
 	s.Intervals, err = completeIntervals(s.Intervals, n)
 	s.Intervals = applyMode(s.Intervals, rot - 1)
-	s.StrIntervals = IntervalsToString(s.Intervals)
+	s.StrIntervals = intervalsToString(s.Intervals)
 	s.Name = IdentifyIntervals(s.StrIntervals)
 	s.Active, _ = readActivity(strActivity, len(s.StrIntervals))
 	return s, err
@@ -184,7 +183,7 @@ func NewScale(strIntervals *string, strActivity *string, rot int) (Scale, error)
 func NewScaleFromIntervals(intervals []int) Scale {
 	var s Scale
 	s.Intervals = intervals
-	s.StrIntervals = IntervalsToString(intervals)
+	s.StrIntervals = intervalsToString(intervals)
 	s.Name = IdentifyIntervals(s.StrIntervals)
 	for i := 0; i < octave; i++ {
 		s.Active = append(s.Active, true)

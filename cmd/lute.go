@@ -18,6 +18,8 @@ func main() {
 	var tonic = flag.Int("s", 0, "Fret of the tonic note on the lowest string ")
 	var active = flag.String("a", "*", "Binary mask to apply to the scale toggling visibility of each note")
 	var enumChords = flag.Bool("c", false, "Enumerate all playable 4 note chords from given scale")
+	var buildChord = flag.String("b", "", "Steps to apply to build a chord (eg 3,3 for root inversion triad")
+	var chordRoot = flag.Int("r", 0, "Degree of root note when using -b")
 
 	// Mode 2: enumerate scales
 	var enumScales = flag.Int("e", 0, "Enumerate all possible 1 octave scales of n notes")
@@ -27,7 +29,7 @@ func main() {
 	//var database = flag.String("d", "~/go/src/lute/data/modes.json", "Path to JSON file containing aliases for interval permuations")
 	var database = flag.String("d", os.Getenv("HOME") + "/go/src/lute/data/modes.json", "Path to JSON file containing aliases for interval permuations")
 
-	var tuning = flag.String("t", "enbngndnanen", "Pitches of strings in descending order. Variable length.")
+	var tuning = flag.String("t", "enbngndnanen", "Pitches of strings in descending pitch order. Variable length.")
 	var outputFile = flag.String("o", "", "Write output to specified file")
 	var vertical = flag.Bool("v", false, "Print diagrams vertically instead of horizontally")
 
@@ -106,6 +108,18 @@ func main() {
 			fmt.Fprintln(output, "Enumerating all 4 note chords from given scale:")
 			fmt.Fprintln(output, )
 			fb.PrintChords(*vertical, output)
+		}
+		if *buildChord != "" {
+			if *chordRoot == 0 {
+				fmt.Println(output, "Please specify chord root with -r")
+				fmt.Fprintln(output, )
+			} else {
+				fmt.Fprintln(output, )
+				fmt.Fprintln(output, )
+				fmt.Fprintln(output, "Printing custom chord voicing")
+				fmt.Fprintln(output, )
+				fb.PrintChordVoicing(*chordRoot, buildChord, output)
+			}
 		}
 		return
 	}

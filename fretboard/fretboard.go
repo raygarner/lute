@@ -1,6 +1,7 @@
 package fretboard
 
 import (
+	"strconv"
 	"io"
 	"fmt"
 	"strings"
@@ -10,6 +11,7 @@ import (
 
 const chordMaxWidth = 4
 const chordDesiredNotes = 4
+const seperator = ","
 
 type Fretboard struct {
 	strings []guitarstring.GuitarString
@@ -50,6 +52,80 @@ func countNotes(chord []int) int {
 		}
 	}
 	return total
+}
+
+//TODO: prevent octaves by only allowing allowing the same degree to be done
+// on the next 2 strings and no more
+func getChordOptions(degrees []int, chord []int, lowerstring int) [][]int {
+	var newchord = make([]int, len(chord))
+	var ret [][]int
+
+	if len(degrees) == 0 {
+		copy(newchord, chord)
+		return append(ret, newchord)
+	}
+	for s := lowerstring - 1; s >= len(degrees)-1 && len(degrees) > 0; s-- {
+		fmt.Println("s", s)
+		fmt.Println("degrees[0]", degrees[0])
+		copy(newchord, chord)
+		newchord[s] = degrees[0]
+		ret = append(ret, getChordOptions(degrees[1:], newchord, s)...)
+	}
+	return ret
+}
+
+// bass = lowest note of chord (defined as degree of scale)
+// steps = slice of ints describing the construction of the chord as steps
+//   eg: [2,2] is a close voiced triad 
+// ret = list of chords (the different ways to play that voicing on teh different strings)
+func buildChord(bass int, steps []int, strings int, scaleLen int) [][]int {
+	var degrees []int
+	var current int
+	var chord = make([]int, strings)
+
+	fmt.Println("scaleLen", scaleLen)
+	fmt.Println("strings", strings)
+
+	//step 1: calculate degrees from steps
+	degrees = append(degrees, bass)
+	current = bass
+	for _, s := range steps {
+		current += (s-1)
+		current %= scaleLen
+		degrees = append(degrees, current)
+	}
+	fmt.Println("degrees", degrees)
+	return getChordOptions(degrees, chord, strings)
+}
+
+// TODO: combine this with readIntervals in scale.go (its basically a copy paste)
+func readSteps(strSteps *string) ([]int, error) {
+	var intIntervals []int
+	for _, strInterval := range strings.Split(*strSteps, seperator) {
+		val, _ := strconv.Atoi(string(strInterval))
+		intIntervals = append(intIntervals, val)
+	}
+	return intIntervals, nil
+}
+
+//takes a list of steps and a start note and prints the possible ways to play
+//that chord
+//TODO: debug the printing because not all the notes in each chord are being shown
+func (fb Fretboard) PrintChordVoicing(bass int, strSteps *string, output io.Writer) {
+	var tmpfb Fretboard
+	//var lowest, highest int
+
+	steps, _ := readSteps(strSteps)
+	fmt.Fprintln(output, "steps", steps)
+	fmt.Fprintln(output, "bass", bass)
+	chordOptions := buildChord(bass, steps, len(fb.strings), len(fb.scale.Intervals))
+	fmt.Fprintln(output, "chord options", chordOptions)
+	for _, c := range chordOptions {
+		//tmpfb, _, lowest, highest = fb.applyChord(c)
+		tmpfb, _, _, _ = fb.applyChord(c)
+		//tmpfb.Print(lowest, highest, output)
+		tmpfb.Print(0, 12, output)
+	}
 }
 
 // degrees = number of degrees in scale
@@ -108,6 +184,7 @@ func (fb Fretboard) PrintChords(vertical bool, output io.Writer) {
 }
 
 // TODO: tidy this return
+// TODO: fix highest and lowest return
 func (fb Fretboard) applyChord(chord []int) (Fretboard,bool,int,int) {
 	var newfb Fretboard
 	newfb = NewFretboard(fb.tuning, fb.scale, fb.tonic)
