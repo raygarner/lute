@@ -91,7 +91,7 @@ func buildChord(bass int, steps []int, strings int, scaleLen int) [][]int {
 	current = bass
 	for _, s := range steps {
 		current += (s-1)
-		current %= scaleLen
+		current %= scaleLen+1
 		degrees = append(degrees, current)
 	}
 	fmt.Println("degrees", degrees)
