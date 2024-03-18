@@ -56,7 +56,8 @@ func countNotes(chord []int) int {
 
 //TODO: prevent octaves by only allowing allowing the same degree to be done
 // on the next 2 strings and no more
-func getChordOptions(degrees []int, chord []int, lowerstring int) [][]int {
+// stringrange = number of strings to try this degree on
+func getChordOptions(degrees []int, chord []int, lowerstring int, stringrange int) [][]int {
 	var newchord = make([]int, len(chord))
 	var ret [][]int
 
@@ -69,7 +70,8 @@ func getChordOptions(degrees []int, chord []int, lowerstring int) [][]int {
 		fmt.Println("degrees[0]", degrees[0])
 		copy(newchord, chord)
 		newchord[s] = degrees[0]
-		ret = append(ret, getChordOptions(degrees[1:], newchord, s)...)
+		ret = append(ret, getChordOptions(degrees[1:], newchord, s, 3)...)
+		stringrange--
 	}
 	return ret
 }
@@ -78,7 +80,7 @@ func getChordOptions(degrees []int, chord []int, lowerstring int) [][]int {
 // steps = slice of ints describing the construction of the chord as steps
 //   eg: [2,2] is a close voiced triad 
 // ret = list of chords (the different ways to play that voicing on teh different strings)
-func buildChord(bass int, steps []int, strings int, scaleLen int) [][]int {
+func buildChord(bass int, steps []int, strings int, scaleLen int, inversion int) [][]int {
 	var degrees []int
 	var current int
 	var chord = make([]int, strings)
@@ -97,8 +99,11 @@ func buildChord(bass int, steps []int, strings int, scaleLen int) [][]int {
 		}
 		degrees = append(degrees, current)
 	}
+	for i := 0; i < inversion; i++ {
+		degrees = scale.Rot(degrees)
+	}
 	fmt.Println("degrees", degrees)
-	return getChordOptions(degrees, chord, strings)
+	return getChordOptions(degrees, chord, strings, 999)
 }
 
 // TODO: combine this with readIntervals in scale.go (its basically a copy paste)
@@ -113,15 +118,14 @@ func readSteps(strSteps *string) ([]int, error) {
 
 //takes a list of steps and a start note and prints the possible ways to play
 //that chord
-//TODO: debug the printing because not all the notes in each chord are being shown
-func (fb Fretboard) PrintChordVoicing(bass int, strSteps *string, output io.Writer) {
+func (fb Fretboard) PrintChordVoicing(bass int, strSteps *string, inversion int, output io.Writer) {
 	var tmpfb Fretboard
 	//var lowest, highest int
 
 	steps, _ := readSteps(strSteps)
 	fmt.Fprintln(output, "steps", steps)
 	fmt.Fprintln(output, "bass", bass)
-	chordOptions := buildChord(bass, steps, len(fb.strings), len(fb.scale.Intervals))
+	chordOptions := buildChord(bass, steps, len(fb.strings), len(fb.scale.Intervals), inversion)
 	fmt.Fprintln(output, "chord options", chordOptions)
 	for _, c := range chordOptions {
 		//tmpfb, _, lowest, highest = fb.applyChord(c)
@@ -135,7 +139,7 @@ func (fb Fretboard) PrintChordVoicing(bass int, strSteps *string, output io.Writ
 // len(chord) = number of strings, each element is the degree to be played on that string
 // strings = the number of strings yet to be handled
 // returns a list of chords
-// TODO: remove duplicates
+// TODO: remove duplicates ?
 func EnumerateChords(degrees int, chord []int, strings int) [][]int {
 	var ret [][]int
 	var newchord = make([]int, len(chord))

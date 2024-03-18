@@ -1,3 +1,7 @@
+test interval chord builder with different scales
+
+make chord builder work with vertical printing
+make chord builder octave specific (dont have note again more than 2 strings away)
 make UI show 24 frets?
 combine reading intervals (in scale) and reading steps (in fb)
 implement TG V-system for chords
@@ -13,7 +17,7 @@ regex compatability for specifying activity string
 input safety
 make json path installable
 use actual notes
-	pitch naming will be necessary (use algorithm from mosaic)
+	pitch naming will be necessary (use algsorithm from mosaic)
 be able to detect symmetric scales when calculating relative modes
 parameterise the ammount of tones in an octave
 	would involve also changing neck length

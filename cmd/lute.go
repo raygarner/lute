@@ -20,6 +20,7 @@ func main() {
 	var enumChords = flag.Bool("c", false, "Enumerate all playable 4 note chords from given scale")
 	var buildChord = flag.String("b", "", "Steps to apply to build a chord (eg 3,3 for root inversion triad")
 	var chordRoot = flag.Int("r", 0, "Degree of root note when using -b")
+	var inversion = flag.Int("inv", 0, "Inversion of the chord inputting with -b")
 
 	// Mode 2: enumerate scales
 	var enumScales = flag.Int("e", 0, "Enumerate all possible 1 octave scales of n notes")
@@ -118,7 +119,7 @@ func main() {
 				fmt.Fprintln(output, )
 				fmt.Fprintln(output, "Printing custom chord voicing")
 				fmt.Fprintln(output, )
-				fb.PrintChordVoicing(*chordRoot, buildChord, output)
+				fb.PrintChordVoicing(*chordRoot, buildChord, *inversion, output)
 			}
 		}
 		return

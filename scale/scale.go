@@ -23,7 +23,7 @@ const seperator = ","
 func RelativeScales(intervals []int) []Scale {
 	var ret []Scale
 	for i := 0; i < len(intervals)-1; i++ {
-		intervals = rot(intervals)
+		intervals = Rot(intervals)
 		ret = append(ret, NewScaleFromIntervals(intervals))
 	}
 	return ret
@@ -110,14 +110,14 @@ func intervalsToString(intervals []int) string {
 }
 
 // rotates a slice one step to the right
-func rot(s []int) []int {
+func Rot(s []int) []int {
 	return append(s[1:], s[0])
 }
 
 func CalcStrings(baseIntervals []int) {
 	fmt.Println(intervalsToString(baseIntervals))
 	for _, _ = range baseIntervals {
-		baseIntervals = rot(baseIntervals)
+		baseIntervals = Rot(baseIntervals)
 		fmt.Println(intervalsToString(baseIntervals))
 	}
 }
@@ -125,7 +125,7 @@ func CalcStrings(baseIntervals []int) {
 // gets the mode of a slice of intervals by repeatedly rotating it
 func applyMode(intervals []int, mode int) []int {
 	for i := 0; i < mode; i++ {
-		intervals = rot(intervals)
+		intervals = Rot(intervals)
 	}
 	return intervals
 }
