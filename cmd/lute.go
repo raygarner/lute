@@ -17,7 +17,7 @@ func main() {
 	var mode = flag.Int("m", 1, "Mode of the interval list passed to apply")
 	var tonic = flag.Int("s", 0, "Fret of the tonic note on the lowest string ")
 	var active = flag.String("a", "*", "Binary mask to apply to the scale toggling visibility of each note")
-	var enumChords = flag.Bool("c", false, "Enumerate all playable 4 note chords from given scale")
+	var enumChords = flag.Int("c", 0, "Enumerate all playable n note chords from given scale")
 	var buildChord = flag.String("b", "", "Steps to apply to build a chord (eg 3,3 for root inversion triad")
 	var chordRoot = flag.Int("r", 0, "Degree of root note when using -b")
 	var inversion = flag.Int("inv", 0, "Inversion of the chord inputting with -b")
@@ -103,12 +103,12 @@ func main() {
 		for m, r := range relatives {
 			fmt.Fprintf(output, "%d: %s %s\n", m+2, r.StrIntervals, r.Name)
 		}
-		if *enumChords {
+		if *enumChords > 0 {
 			fmt.Fprintln(output, )
 			fmt.Fprintln(output, )
 			fmt.Fprintln(output, "Enumerating all 4 note chords from given scale:")
 			fmt.Fprintln(output, )
-			fb.PrintChords(*vertical, output)
+			fb.PrintChords(*vertical, output, *enumChords)
 		}
 		if *buildChord != "" {
 			if *chordRoot == 0 {
@@ -135,7 +135,7 @@ func main() {
 			fmt.Fprintln(output, "Please specify the root using -s")
 			return
 		}
-		if *enumChords {
+		if *enumChords > 0 {
 			fmt.Fprintln(output, "-c cannot be used with -e")
 			return
 		}

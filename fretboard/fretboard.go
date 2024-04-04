@@ -10,7 +10,7 @@ import (
 )
 
 const chordMaxWidth = 4
-const chordDesiredNotes = 4
+//const chordDesiredNotes = 4
 const seperator = ","
 
 type Fretboard struct {
@@ -78,7 +78,7 @@ func getChordOptions(degrees []int, chord []int, lowerstring int, stringrange in
 
 // bass = lowest note of chord (defined as degree of scale)
 // steps = slice of ints describing the construction of the chord as steps
-//   eg: [2,2] is a close voiced triad 
+//   eg: [3,3] is a close voiced triad 
 // ret = list of chords (the different ways to play that voicing on teh different strings)
 func buildChord(bass int, steps []int, strings int, scaleLen int, inversion int) [][]int {
 	var degrees []int
@@ -129,7 +129,7 @@ func (fb Fretboard) PrintChordVoicing(bass int, strSteps *string, inversion int,
 	fmt.Fprintln(output, "chord options", chordOptions)
 	for _, c := range chordOptions {
 		//tmpfb, _, lowest, highest = fb.applyChord(c)
-		tmpfb, _, _, _ = fb.applyChord(c)
+		tmpfb, _, _, _ = fb.applyChord(c, 4)
 		//tmpfb.Print(lowest, highest, output)
 		tmpfb.Print(0, 12, output)
 	}
@@ -140,7 +140,7 @@ func (fb Fretboard) PrintChordVoicing(bass int, strSteps *string, inversion int,
 // strings = the number of strings yet to be handled
 // returns a list of chords
 // TODO: remove duplicates ?
-func EnumerateChords(degrees int, chord []int, strings int) [][]int {
+func EnumerateChords(degrees int, chord []int, strings int, chordDesiredNotes int) [][]int {
 	var ret [][]int
 	var newchord = make([]int, len(chord))
 
@@ -153,19 +153,19 @@ func EnumerateChords(degrees int, chord []int, strings int) [][]int {
 	}
 	for d := 0; d <= degrees; d++ {
 		copy(newchord, chord)
-		ret = append(ret, EnumerateChords(degrees, append(newchord, d), strings-1)...)
+		ret = append(ret, EnumerateChords(degrees, append(newchord, d), strings-1, chordDesiredNotes)...)
 	}
 	return ret
 }
 
-func (fb Fretboard) PrintChords(vertical bool, output io.Writer) {
+func (fb Fretboard) PrintChords(vertical bool, output io.Writer, chordDesiredNotes int) {
 	var chord []int
-	var chords = EnumerateChords(len(fb.scale.Intervals), chord, len(fb.strings))
+	var chords = EnumerateChords(len(fb.scale.Intervals), chord, len(fb.strings), chordDesiredNotes)
 	var tmpfb Fretboard
 	var playable bool
 	var lowest, highest int
 	for _, c := range chords {
-		tmpfb, playable, lowest, highest = fb.applyChord(c)
+		tmpfb, playable, lowest, highest = fb.applyChord(c, chordDesiredNotes)
 		if playable {
 			//fmt.Println(c)
 			fmt.Fprintln(output, c)
@@ -192,7 +192,7 @@ func (fb Fretboard) PrintChords(vertical bool, output io.Writer) {
 
 // TODO: tidy this return
 // TODO: fix highest and lowest return
-func (fb Fretboard) applyChord(chord []int) (Fretboard,bool,int,int) {
+func (fb Fretboard) applyChord(chord []int, chordDesiredNotes int) (Fretboard,bool,int,int) {
 	var newfb Fretboard
 	newfb = NewFretboard(fb.tuning, fb.scale, fb.tonic)
 	var lowest = 999
